@@ -5,55 +5,68 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        width: '100vw',
-        overflow: 'hidden',
-        position: 'fixed',    // <--- THE REAL FIX
-        top: 0,
-        left: 0,
+<Box
+  sx={{
+    flex: 1,
+    width: "100%",
+    minHeight: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
 
-        backgroundImage: `
-          linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
-          url(https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?auto=format&fit=crop&w=1600&q=80)
-        `,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+    backgroundImage: `
+      linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+      url(https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?auto=format&fit=crop&w=1600&q=80)
+    `,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    color: "white",
+    padding: "20px 20px",
+  }}
+>
 
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
 
-        paddingTop: '70px',       // navbar height
-        paddingLeft: '60px',
-
-        fontFamily: 'Inter, sans-serif',
-        color: 'white',
-      }}
-    >
-      <Box sx={{ transform: "translateY(-30px)" }}>
+      <Box>
+        {/* Main Title */}
         <Typography
           variant="h3"
-          fontWeight={700}
-          mb={2}
-          sx={{ fontFamily: 'Inter, sans-serif' }}
+          sx={{
+            fontWeight: 700,
+            mb: 2,
+            fontFamily: "Inter, sans-serif",
+            whiteSpace: 'nowrap', // stays on one line
+          }}
         >
           Fresh From Farm to Your Table 🌿
         </Typography>
 
+        {/* Single-Line Tagline */}
         <Typography
-          variant="h6"
-          mb={3}
-          sx={{ maxWidth: 450, fontFamily: 'Inter, sans-serif' }}
+          sx={{
+            fontSize: '1rem',
+            mb: 3,
+            fontFamily: "Inter, sans-serif",
+            whiteSpace: 'nowrap', // prevents wrapping
+          }}
         >
           Empowering farmers and connecting rural products to digital markets.
         </Typography>
 
+        {/* Button */}
         <Button
           variant="contained"
-          size="large"
           onClick={() => navigate("/buyer/dashboard")}
+          sx={{
+            backgroundColor: "#2e7d32",
+            padding: "6px 20px",
+            textTransform: "none",
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            borderRadius: "8px",
+            '&:hover': { backgroundColor: "#1b5e20" }
+          }}
         >
           Explore Products
         </Button>

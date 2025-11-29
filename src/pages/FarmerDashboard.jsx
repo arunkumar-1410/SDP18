@@ -1,48 +1,109 @@
-import React from 'react';
-import { Box, Grid, Paper, Typography, Card, CardMedia, CardContent, TextField, Button } from '@mui/material';
-import useForm from '../hooks/useForm';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addFarmerProduct } from "../redux/StatsSlice";
+import { Box, Card, Typography, Button, Grid, TextField } from "@mui/material";
 
-const demoImages = [
-  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1506802230852-767b7b1e7aef?auto=format&fit=crop&w=400&q=80"
+const products = [
+  { name: "Apple", icon: "🍎" },
+  { name: "Banana", icon: "🍌" },
+  { name: "Carrot", icon: "🥕" },
+  { name: "Tomato", icon: "🍅" },
+  { name: "Coriander", icon: "🌿" },
 ];
 
-function FarmerDashboard() {
-  const { values, handleChange, resetForm } = useForm({ name: '', description: '', price: '', image: '' });
-  const [products, setProducts] = React.useState([]);
+export default function FarmerDashboard() {
+  const dispatch = useDispatch();
 
-  const handleAddProduct = () => {
-    setProducts(prev => [...prev, { ...values, id: Date.now(), image: values.image || demoImages[Math.floor(Math.random() * demoImages.length)] }]);
-    resetForm();
+  const priceLimits = useSelector((state) => state.stats.priceLimits);
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [price, setPrice] = useState("");
+
+  const handleAdd = () => {
+    if (!selectedProduct) return alert("Select a product first");
+
+    const { min, max } = priceLimits[selectedProduct];
+
+    if (price < min || price > max)
+      return alert(
+        `Price must be between ₹${min} and ₹${max} (admin set limit)`
+      );
+
+    dispatch(
+      addFarmerProduct({
+        id: Date.now(),
+        product: selectedProduct,
+        price: Number(price),
+      })
+    );
+
+    alert("Product added to market!");
+    setPrice("");
+    setSelectedProduct(null);
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" mb={4}>Manage Your Products</Typography>
-      {/* Add Product Form */}
-      <Grid spacing={2} container mb={4}>
-        <Grid item xs={12} md={3}><TextField fullWidth label="Name" name="name" value={values.name} onChange={handleChange} /></Grid>
-        <Grid item xs={12} md={4}><TextField fullWidth label="Description" name="description" value={values.description} onChange={handleChange} /></Grid>
-        <Grid item xs={12} md={2}><TextField fullWidth label="Price" name="price" value={values.price} onChange={handleChange} type="number" /></Grid>
-        <Grid item xs={12} md={3}><Button fullWidth variant="contained" onClick={handleAddProduct}>Add Product</Button></Grid>
-      </Grid>
-      {/* Products Grid */}
-      <Grid container spacing={3}>
-        {products.map(product => (
-          <Grid item xs={12} md={4} key={product.id}>
-            <Card sx={{ height: '100%', transition: 'all 0.3s', '&:hover': { boxShadow: 6, transform: 'scale(1.02)' } }}>
-              <CardMedia image={product.image} height="140" sx={{ objectFit: 'cover' }} />
-              <CardContent>
-                <Typography variant="h6">{product.name}</Typography>
-                <Typography variant="body2" color="text.secondary">{product.description}</Typography>
-                <Typography color="primary" mt={2}>₹{product.price}</Typography>
-              </CardContent>
+    <Box sx={{ padding: "20px", marginTop: "40px" }}>
+      <Typography variant="h4" sx={{ mb: 3 }} fontWeight={600}>
+        Farmer Dashboard
+      </Typography>
+
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Select Product
+      </Typography>
+
+      <Grid container spacing={2}>
+        {products.map((p) => (
+          <Grid size={{ xs: 12, sm: 6, md: 2 }} key={p.name}>
+            <Card
+              onClick={() => setSelectedProduct(p.name)}
+              sx={{
+                p: 2,
+                textAlign: "center",
+                border:
+                  selectedProduct === p.name ? "2px solid green" : "1px solid #ccc",
+                cursor: "pointer",
+                borderRadius: "12px",
+              }}
+            >
+              <Typography fontSize={40}>{p.icon}</Typography>
+              <Typography>{p.name}</Typography>
             </Card>
           </Grid>
         ))}
       </Grid>
+
+      {selectedProduct && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6">
+            Set Price for {selectedProduct}
+          </Typography>
+
+          <Typography sx={{ color: "green", mb: 1 }}>
+            Allowed Range: ₹{priceLimits[selectedProduct].min} – ₹
+            {priceLimits[selectedProduct].max}
+          </Typography>
+
+          <TextField
+            type="number"
+            label="Enter Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+
+          <Button
+            variant="contained"
+            sx={{
+              ml: 2,
+              backgroundColor: "#2e7d32",
+              "&:hover": { backgroundColor: "#1b5e20" },
+            }}
+            onClick={handleAdd}
+          >
+            Add to Market
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 }
-
-export default FarmerDashboard;

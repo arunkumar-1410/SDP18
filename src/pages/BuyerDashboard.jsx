@@ -1,70 +1,107 @@
-import React, { useState } from 'react';
-import { Box, Grid, Card, CardMedia, CardContent, Typography, Button, Rating } from '@mui/material';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { recordPurchase } from "../redux/StatsSlice";
+import {
+  Box,
+  Card,
+  Typography,
+  Grid,
+  Button,
+} from "@mui/material";
 
-const products = [
-  {
-    id: 1,
-    name: "Organic Honey",
-    description: "Pure honey",
-    price: 250,
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80"
-  },
-  {
-    id: 2,
-    name: "Artisan Jam",
-    description: "Fresh handmade jam",
-    price: 180,
-    image: "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=600&q=80"
-  }
-];
+export default function BuyerDashboard() {
+  const dispatch = useDispatch();
 
-function BuyerDashboard() {
+  const marketItems = useSelector((state) => state.stats.marketItems);
+
   const [cart, setCart] = useState([]);
-  const [ratings, setRatings] = useState({});
+
+  const handleBuy = (item) => {
+    dispatch(
+      recordPurchase({
+        product: item.product,
+        price: item.price,
+      })
+    );
+
+    setCart((prev) => [...prev, item]);
+    alert(`${item.product} added to cart!`);
+  };
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <Box p={4}>
-      <Typography variant="h4" mb={4}>Products for Sale</Typography>
+    <Box sx={{ padding: "20px", marginTop: "40px" }}>
+      <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>
+        Buyer Dashboard
+      </Typography>
 
-      <Grid container spacing={3}>
-        {products.map(p => (
-          <Grid item xs={12} md={4} key={p.id}>
-            <Card sx={{ height: '100%', '&:hover': { boxShadow: 6 } }}>
-              <CardMedia component="img" height="180" image={p.image} alt={p.name} />
+      <Typography variant="h6">Available Market Items</Typography>
 
-              <CardContent>
-                <Typography variant="h6">{p.name}</Typography>
-                <Typography variant="body2">{p.description}</Typography>
-                <Typography fontWeight={600} color="primary">₹{p.price}</Typography>
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        {marketItems.length === 0 ? (
+          <Typography sx={{ mt: 3, ml: 2 }}>
+            No items added yet by farmers.
+          </Typography>
+        ) : (
+          marketItems.map((item) => (
+            <Grid key={item.id} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Card
+                sx={{
+                  p: 2,
+                  borderRadius: "12px",
+                  textAlign: "center",
+                  boxShadow: 3,
+                }}
+              >
+                <Typography fontSize={35}>🛒</Typography>
 
-                <Rating
-                  value={ratings[p.id] || 3}
-                  onChange={(e, val) => setRatings({ ...ratings, [p.id]: val })}
-                />
+                <Typography fontWeight={600} fontSize={18}>
+                  {item.product}
+                </Typography>
+
+                <Typography color="green" fontSize={16} sx={{ mt: 1 }}>
+                  ₹{item.price}
+                </Typography>
 
                 <Button
                   variant="contained"
+                  sx={{
+                    mt: 2,
+                    backgroundColor: "#2e7d32",
+                    "&:hover": { backgroundColor: "#1b5e20" },
+                  }}
                   fullWidth
-                  sx={{ mt: 2 }}
-                  onClick={() => setCart(prev => [...prev, p])}
+                  onClick={() => handleBuy(item)}
                 >
-                  Add to Cart
+                  Buy
                 </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+              </Card>
+            </Grid>
+          ))
+        )}
       </Grid>
 
-      <Box mt={4}>
-        <Typography variant="h6">Your Cart:</Typography>
-        {cart.length === 0
-          ? <Typography>No items added</Typography>
-          : cart.map((item, i) => <Typography key={i}>{item.name} — ₹{item.price}</Typography>)
-        }
+      {/* CART SECTION */}
+      <Box sx={{ mt: 5 }}>
+        <Typography variant="h6">Your Cart</Typography>
+
+        {cart.length === 0 ? (
+          <Typography sx={{ mt: 1 }}>Cart is empty.</Typography>
+        ) : (
+          <>
+            {cart.map((item, index) => (
+              <Typography key={index}>
+                {item.product} — ₹{item.price}
+              </Typography>
+            ))}
+
+            <Typography sx={{ mt: 2, fontWeight: 600 }}>
+              Total: ₹{total}
+            </Typography>
+          </>
+        )}
       </Box>
     </Box>
   );
 }
-
-export default BuyerDashboard;
