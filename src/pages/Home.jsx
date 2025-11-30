@@ -26,8 +26,6 @@ function Home() {
     padding: "20px 20px",
   }}
 >
-
-
       <Box>
         {/* Main Title */}
         <Typography

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import NavBar from "./components/NavBar";
 
 import Home from "./pages/Home";
 import AdminLogin from "./pages/AdminLogin";
@@ -22,7 +22,7 @@ function AppContent() {
       }}
     >
       {/* NAVBAR */}
-      <Navbar />
+      <NavBar />
 
       {/* MAIN AREA */}
       <main
